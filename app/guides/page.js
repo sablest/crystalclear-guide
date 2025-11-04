@@ -1,5 +1,6 @@
-// Импортируем наш "телефон"
-import db from '../../lib/firebase'; // Убедись, что путь правильный
+// --- Вот изменение ---
+// 1. Импортируем { db } по имени (в фигурных скобках)
+import { db } from '../../lib/firebase'; 
 
 // Эта функция будет запущена на сервере (Vercel)
 async function getGuides() {
@@ -20,7 +21,6 @@ async function getGuides() {
     return guides;
   } catch (error) {
     console.error("Ошибка при получении данных из Firestore:", error);
-    // Возвращаем пустой массив, чтобы страница не "сломалась"
     return []; 
   }
 }
@@ -46,5 +46,4 @@ export default async function GuidesPage() {
   );
 }
 
-// Говорим Next.js не кэшировать эту страницу, чтобы мы видели изменения
 export const dynamic = 'force-dynamic';
