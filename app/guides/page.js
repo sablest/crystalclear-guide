@@ -1,8 +1,6 @@
-// --- Вот изменение ---
-// 1. Импортируем { db } по имени (в фигурных скобках)
 import { db } from '../../lib/firebase'; 
+import Link from 'next/link'; // <--- 1. ИМПОРТИРУЕМ LINK
 
-// Эта функция будет запущена на сервере (Vercel)
 async function getGuides() {
   try {
     const guidesRef = db.collection('guides');
@@ -34,9 +32,14 @@ export default async function GuidesPage() {
       {guides.length > 0 ? (
         <ul>
           {guides.map((guide) => (
-            <li key={guide.id}>
-              {guide.title} (Slug: {guide.slug})
-            </li>
+            // --- 2. ВОТ ИЗМЕНЕНИЯ ---
+            // Оборачиваем `li` в `Link`, который ведет на /guides/ИМЯ-СЛАГА
+            <Link key={guide.id} href={`/guides/${guide.slug}`}>
+              <li>
+                {guide.title} (Slug: {guide.slug})
+              </li>
+            </Link>
+            // --- КОНЕЦ ИЗМЕНЕНИЙ ---
           ))}
         </ul>
       ) : (
