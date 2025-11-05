@@ -1,10 +1,16 @@
-import { db } from '../../../lib/firebase'; // Идем на 3 уровня вверх, чтобы найти lib
+import { db } from '../../../lib/firebase';
 
-// Эта функция найдет гайд по его 'slug'
 async function getGuideBySlug(slug) {
+  // --- 1. ДОБАВЛЯЕМ ПРОВЕРКУ ---
+  // Если slug по какой-то причине "undefined", сразу выходим.
+  if (!slug) {
+    console.log("getGuideBySlug был вызван без slug. Пропускаем.");
+    return null;
+  }
+  // --- КОНЕЦ ПРОВЕРКИ ---
+
   try {
     const guidesRef = db.collection('guides');
-    // Создаем запрос: "найди в 'guides' документ, где поле 'slug' равно нашему slug"
     const snapshot = await guidesRef.where('slug', '==', slug).limit(1).get();
 
     if (snapshot.empty) {
@@ -12,18 +18,20 @@ async function getGuideBySlug(slug) {
       return null;
     }
 
-    // Так как slug уникальный, мы берем первый (и единственный) результат
     const doc = snapshot.docs[0];
     return { id: doc.id, ...doc.data() };
 
   } catch (error) {
-    console.error("Ошибка при получении гайда по slug:", error);
+    // --- 2. УЛУЧШАЕМ ЛОГ ОБ ОШИБКЕ ---
+    // Теперь, если будет ошибка, мы увидим, с каким slug она произошла
+    console.error(`Ошибка при получении гайда по slug: ${slug}`, error);
     return null;
   }
 }
 
-// `params` - это то, что Next.js берет из URL (наш `[slug]`)
 export default async function GuideDetailPage({ params }) {
+  // Теперь, даже если params.slug придет как 'undefined',
+  // наша функция getGuideBySlug() с этим справится.
   const guide = await getGuideBySlug(params.slug);
 
   return (
@@ -41,5 +49,4 @@ export default async function GuideDetailPage({ params }) {
   );
 }
 
-// Говорим Next.js не кэшировать
 export const dynamic = 'force-dynamic';
