@@ -1,7 +1,6 @@
 import { db } from '../../../lib/firebase';
 import React from 'react'; 
 
-// Функция не меняется, она все еще принимает просто "строку"
 async function getGuideBySlug(slug: string | undefined) { 
   if (!slug) {
     console.log("getGuideBySlug был вызван без slug. Пропускаем.");
@@ -9,7 +8,6 @@ async function getGuideBySlug(slug: string | undefined) {
   }
 
   try {
-    // В Firestore мы все еще ищем поле с именем 'slug'
     const guidesRef = db.collection('guides');
     const snapshot = await guidesRef.where('slug', '==', slug).limit(1).get();
 
@@ -32,14 +30,16 @@ async function getGuideBySlug(slug: string | undefined) {
 }
 
 // --- ВОТ ГЛАВНЫЕ ИЗМЕНЕНИЯ ---
-// 1. Мы говорим TypeScript, что ждем 'guideSlug'
-export default async function GuideDetailPage({ params }: { params: { guideSlug: string } }) { 
+// 1. Принимаем 'props: any' целиком, чтобы посмотреть, что там
+export default async function GuideDetailPage(props: any) { 
   
-  // 2. Мы логируем 'guideSlug'
-  console.log('GuideDetailPage рендерится. Полученные params.guideSlug:', params.guideSlug);
+  // 2. Логируем 'props' ПОЛНОСТЬЮ
+  console.log('GuideDetailPage рендерится. Полученные props:', JSON.stringify(props));
 
-  // 3. Мы передаем params.guideSlug (а не params.slug) в нашу функцию
-  const guide: any = await getGuideBySlug(params.guideSlug); 
+  // 3. Пытаемся "безопасно" достать slug из props.params
+  const slug = props.params?.guideSlug; 
+  const guide: any = await getGuideBySlug(slug); 
+  // --- КОНЕЦ ИЗМЕНЕНИЙ ---
 
   return (
     <div>
