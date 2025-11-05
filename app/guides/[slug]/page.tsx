@@ -20,18 +20,23 @@ async function getGuideBySlug(slug: string | undefined) {
     return { id: doc.id, ...doc.data() };
 
   } catch (error) {
-    // --- ВОТ ИСПРАВЛЕНИЕ ---
     if (error instanceof Error) {
       console.error(`Ошибка при получении гайда по slug: ${slug}`, error.stack);
     } else {
       console.error(`Ошибка при получении гайда по slug: ${slug}`, error);
     }
-    // --- КОНЕЦ ИСПРАВЛЕНИЯ ---
     return null;
   }
 }
 
+// Добавляем тип для params
 export default async function GuideDetailPage({ params }: { params: { slug: string } }) { 
+  
+  // --- ВОТ ГЛАВНОЕ ИЗМЕНЕНИЕ ---
+  // Давайте посмотрим, что ВООБЩЕ приходит в params
+  console.log('GuideDetailPage рендерится. Полученные params:', JSON.stringify(params));
+  // --- КОНЕЦ ИЗМЕНЕНИЯ ---
+
   const guide: any = await getGuideBySlug(params.slug); 
 
   return (
