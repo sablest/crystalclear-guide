@@ -1,13 +1,11 @@
 import { db } from '../../../lib/firebase';
+import React from 'react'; 
 
-async function getGuideBySlug(slug) {
-  // --- 1. ДОБАВЛЯЕМ ПРОВЕРКУ ---
-  // Если slug по какой-то причине "undefined", сразу выходим.
+async function getGuideBySlug(slug: string | undefined) { 
   if (!slug) {
     console.log("getGuideBySlug был вызван без slug. Пропускаем.");
     return null;
   }
-  // --- КОНЕЦ ПРОВЕРКИ ---
 
   try {
     const guidesRef = db.collection('guides');
@@ -22,17 +20,19 @@ async function getGuideBySlug(slug) {
     return { id: doc.id, ...doc.data() };
 
   } catch (error) {
-    // --- 2. УЛУЧШАЕМ ЛОГ ОБ ОШИБКЕ ---
-    // Теперь, если будет ошибка, мы увидим, с каким slug она произошла
-    console.error(`Ошибка при получении гайда по slug: ${slug}`, error);
+    // --- ВОТ ИСПРАВЛЕНИЕ ---
+    if (error instanceof Error) {
+      console.error(`Ошибка при получении гайда по slug: ${slug}`, error.stack);
+    } else {
+      console.error(`Ошибка при получении гайда по slug: ${slug}`, error);
+    }
+    // --- КОНЕЦ ИСПРАВЛЕНИЯ ---
     return null;
   }
 }
 
-export default async function GuideDetailPage({ params }) {
-  // Теперь, даже если params.slug придет как 'undefined',
-  // наша функция getGuideBySlug() с этим справится.
-  const guide = await getGuideBySlug(params.slug);
+export default async function GuideDetailPage({ params }: { params: { slug: string } }) { 
+  const guide: any = await getGuideBySlug(params.slug); 
 
   return (
     <div>

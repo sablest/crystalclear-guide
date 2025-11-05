@@ -1,5 +1,6 @@
-import { db } from '../../lib/firebase'; 
-import Link from 'next/link'; // <--- 1. ИМПОРТИРУЕМ LINK
+import { db } from '../../lib/firebase';
+import Link from 'next/link';
+import React from 'react'; 
 
 async function getGuides() {
   try {
@@ -10,15 +11,21 @@ async function getGuides() {
       console.log('No matching documents.');
       return [];
     }
-
-    const guides = [];
+    
+    const guides: any[] = []; 
     snapshot.forEach((doc) => {
       guides.push({ id: doc.id, ...doc.data() });
     });
 
     return guides;
   } catch (error) {
-    console.error("Ошибка при получении данных из Firestore:", error);
+    // --- ВОТ ИСПРАВЛЕНИЕ ---
+    if (error instanceof Error) {
+      console.error("Ошибка при получении данных из Firestore:", error.stack);
+    } else {
+      console.error("Ошибка при получении данных из Firestore:", error);
+    }
+    // --- КОНЕЦ ИСПРАВЛЕНИЯ ---
     return []; 
   }
 }
@@ -31,15 +38,12 @@ export default async function GuidesPage() {
       <h1>Наши Гайды</h1>
       {guides.length > 0 ? (
         <ul>
-          {guides.map((guide) => (
-            // --- 2. ВОТ ИЗМЕНЕНИЯ ---
-            // Оборачиваем `li` в `Link`, который ведет на /guides/ИМЯ-СЛАГА
+          {guides.map((guide: any) => (
             <Link key={guide.id} href={`/guides/${guide.slug}`}>
               <li>
                 {guide.title} (Slug: {guide.slug})
               </li>
             </Link>
-            // --- КОНЕЦ ИЗМЕНЕНИЙ ---
           ))}
         </ul>
       ) : (
